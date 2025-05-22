@@ -139,8 +139,7 @@ checkpoint_inhibitors_iran_re.csv
 
 ## 🧑‍🔬 Author
 
-Created by a researcher for automated data extraction from Scopus with a special interest in Iranian-affiliated biomedical literature.
-
+created by me! Mohammad Ranjbar.
 ---
 
 ## 📜 License
