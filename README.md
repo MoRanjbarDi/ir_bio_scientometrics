@@ -51,16 +51,22 @@ immuno_global_ar_re.csv
 ```
 
 ---
+## 🔑 Access Requirements
 
-## 🔑 Login Required or Institutional IP reqired 
+To access Scopus search results, authentication is necessary. You must either:
 
-Scopus requires login through authentication or connecting from an institute that cooperates with scopus. The script will:
+- Log in through your personal Scopus account,
+- Be connected to a network with institutional access (e.g., university IP address),
+- Or use a proxy or VPN that routes through an institution with a Scopus subscription.
 
-1. Open the Scopus homepage in a browser.
-2. Prompt you to manually log in.
-3. Once you reach the homepage, it will proceed with automated querying and downloading.
+The script will:
+
+1. Launch the Scopus homepage in a browser window.
+2. Allow you to manually authenticate if required.
+3. Automatically continue with query execution and CSV export once access is granted.
 
 ---
+
 
 ## 🧠 Predefined Topics
 
