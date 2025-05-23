@@ -1,153 +1,284 @@
 
-# 🔍 Scopus Filter Counts Exporter
+# 📊 Scopus-Based Scientometric Dashboard
 
-This Python script uses [Playwright](https://playwright.dev/) to automatically extract **filter/facet counts** from [Scopus](https://www.scopus.com) for a series of predefined search queries. It is designed for scientometric analysis and supports different combinations of document types and country affiliations — including a focus on **Iranian publications**.
-
----
-
-## 📂 Project Structure
-
-```
-.
-├── scopus_export.py         # Main script
-├── requirements.txt         # Python dependencies (optional)
-└── scopus_filter_counts2/   # Folder where CSV downloads are saved
-```
+A modular Python system for downloading, managing, and visualizing scientometric data from Scopus. Built using Playwright and Plotly, it supports reproducible downloads and stunning visualizations to study scientific publishing trends, especially for customized queries (e.g., Iranian affiliations, article types, etc.).
 
 ---
 
-## 🚀 Features
+## 📁 Project Structure
 
-- Supports multiple **biomedical and immunotherapy-related queries**
-- Automatically extracts **facet counts** from Scopus (e.g., by subject area, country, document type)
-- Downloads data as `.csv` files for easy downstream analysis
-- Designed to handle different scopes:
-  - **All results**
-  - **Only articles (`ar`)**
-  - **Only reviews (`re`)**
-  - **Only Iranian-affiliated papers**
-  - Combinations of the above
-
----
-
-## 🔍 What It Extracts
-
-For each keyword query, it runs **six variants**:
-
-| Label             | Description                           |
-|------------------|---------------------------------------|
-| `global_ar_re`   | All document types, all countries     |
-| `iran_ar_re`     | All document types, Iran only         |
-| `global_ar`      | Articles only, all countries          |
-| `global_re`      | Reviews only, all countries           |
-| `iran_ar`        | Articles only, Iran only              |
-| `iran_re`        | Reviews only, Iran only               |
-
-Example output filenames:
 ```
-til_iran_ar.csv
-nk_cell_global_re.csv
-immuno_global_ar_re.csv
+├── paper_counts_downloader.py       # Automated downloader using Playwright
+├── my_functions.py                  # Utility and visualization functions
+├── plotting_notebook.ipynb         # User-facing notebook to explore & plot
+├── to_download.csv                 # CSV with queries to fetch from Scopus
+├── files/                           # Directory containing downloaded CSVs
+├── counts/, scatter_area/, ratio/  # Other directories for specific plots
+├── ratio_plot_list.csv             # Defines numerator/denominator for ratios
 ```
 
 ---
-## 🔑 Access Requirements
 
-To access Scopus search results, authentication is necessary. You must either:
+## 🚀 Getting Started
 
-- Log in through your personal Scopus account,
-- Be connected to a network with institutional access (e.g., university IP address),
-- Or use a proxy or VPN that routes through an institution with a Scopus subscription.
+### 1. **Install Required Libraries**
 
-The script will:
-
-1. Launch the Scopus homepage in a browser window.
-2. Allow you to manually authenticate if required.
-3. Automatically continue with query execution and CSV export once access is granted.
-
----
-
-
-## 🧠 Predefined Topics
-
-Queries include:
-
-- **immuno**: general immunotherapy terms
-- **car_t_cell**
-- **til**: Tumor-infiltrating lymphocytes
-- **nk_cell**
-- **macrophage**
-- **checkpoint_inhibitors**
-- **monoclonal_antibodies**
-- **adcs**: Antibody-Drug Conjugates
-- **oncolytic_virus**
-- **cancer_vaccine**
-- **life_sciences**: biomedical subject areas in general
-- **all_articles**: global query to fetch everything
-
----
-
-## ✅ Requirements
-
-Install Python packages:
+Make sure you have the following installed:
 
 ```bash
-pip install playwright
+pip install pandas plotly playwright
 playwright install
 ```
 
-Linux users may also need:
-
-```bash
-playwright install-deps
-```
+You also need **Google Chrome or Chromium** installed for Playwright to control the browser.
 
 ---
 
-## 🖥️ How to Run
+### 2. **Prepare the Queries**
 
-```bash
-python scopus_export.py
-```
+Create a file named `to_download.csv` with two columns:
 
----
-
-### ➕ Optional: Run in Headless Mode
-
-To run without opening a visible browser window, change this line in the script:
-
-```python
-browser = p.chromium.launch(headless=False)
-```
-
-to:
-
-```python
-browser = p.chromium.launch(headless=True)
-```
-
----
-
-## 📁 Output
-
-CSV files will be saved to the `scopus_filter_counts2/` directory with filenames formatted as:
-
-```
-<query_label>_<variation_label>.csv
-```
+- `query_name`: A short label for the query (e.g., `artificial_intelligence`)
+- `query_string`: A Scopus-compatible search string (e.g., `TITLE-ABS-KEY("artificial intelligence")`)
 
 Example:
-```
-checkpoint_inhibitors_iran_re.csv
+
+```csv
+query_name,query_string
+ai,TITLE-ABS-KEY("artificial intelligence")
+ml,TITLE-ABS-KEY("machine learning")
 ```
 
 ---
 
-## 🧑‍🔬 Author
+### 3. **Download Data from Scopus**
 
-created by me! Mohammad Ranjbar.
+To run the downloader, execute:
+
+```bash
+python paper_counts_downloader.py
+```
+
+- You will be prompted to **log into Scopus** manually.
+- The script then automatically navigates to each query, downloads **filter counts**, and saves them as `.csv` files in the `files/` directory.
+- It creates variations for:
+  - Global vs Iran
+  - Article vs Review
+  - Combinations of above
+
+Example output file names:
+- `ai_global_ar_re.csv`
+- `ai_iran_ar_0.csv`
+
 ---
 
-## 📜 License
+## 📈 How to Use
 
-This project is licensed under the MIT License.
+### Open the `plotting_notebook.ipynb` in Jupyter Notebook or VS Code
+
+Import your functions:
+
+```python
+from my_functions import *
+```
+
+Now you're ready to explore the data.
+
+---
+
+## 📊 Plotting Functions
+
+### 1. `scatter_area()`
+
+Overlapping area plot for multiple files.
+
+```python
+scatter_area(dir="./scatter_area")
+```
+
+#### Options:
+- `ignore_current_year`: Skip most recent year(s)
+- `past_what_years`: Limit to last N years
+- `template`: Plotly theme (e.g., `"plotly_dark"`, `"ggplot2"`)
+
+---
+
+### 2. `count_plotter()`
+
+Line chart showing trends in count data over time.
+
+```python
+count_plotter(files_directory="./counts", queryprint=1)
+```
+
+---
+
+### 3. `top_k_what_plotter()`
+
+Top-k bar chart of affiliations, authors, etc.
+
+```python
+top_k_what_plotter("ai_global_ar_re.csv", what="AFFILIATION", k=10)
+```
+
+---
+
+### 4. `ratio_plotter()`
+
+Plots ratio of two count datasets (numerator/denominator) over time.
+
+- Requires `ratio_plot_list.csv` with columns:
+  - `title`: Plot title
+  - `soorat`: CSV for numerator
+  - `makhraj`: CSV for denominator
+
+Example `ratio_plot_list.csv`:
+
+```csv
+title,soorat,makhraj
+Iran Share in AI,ai_iran_ar_re.csv,ai_global_ar_re.csv
+```
+
+Then run:
+
+```python
+ratio_plotter(files_directory="./ratio")
+```
+
+---
+
+### 5. `set_plot_theme("plotly_dark")`
+
+Change the Plotly theme globally for all plots.
+
+---
+
+## 🔄 Workflow
+
+1. **Edit `to_download.csv`** as needed.
+2. **Run `paper_counts_downloader.py`** to fetch updated counts.
+3. **Use the notebook** to read, plot, and analyze the CSVs.
+4. **Repeat** as more data becomes available.
+
+---
+
+## 📎 Notes
+
+- Make sure Scopus access (e.g., through an institution) is valid.
+- The downloader skips already downloaded files to save time.
+- File naming is automatic and follows `[query]_[variation].csv`.
+
+---
+
+## 👤 Author
+
+Created by a researcher working on scientometrics and data-driven insights into research publication trends.
+
+---
+
+## 📄 License
+
+This project is released under the MIT License. You are free to use, modify, and distribute it.
+
+
+---
+
+## 🛠️ Function Reference & Argument Details
+
+Below are detailed explanations of the arguments passed to each core plotting and data-handling function.
+
+---
+
+### 🔹 `read_data(filename, dir='./files')`
+
+**Purpose:**  
+Reads a CSV downloaded from Scopus and extracts the associated query string.
+
+**Arguments:**
+- `filename` *(str)* – Name of the CSV file (e.g. `'ai_global_ar_re.csv'`).
+- `dir` *(str)* – Directory path where the file is stored. Defaults to `'./files'`.
+
+---
+
+### 🔹 `scatter_area(...)`
+
+**Purpose:**  
+Creates overlapping area plots of yearly paper counts from multiple CSV files in a folder.
+
+**Arguments:**
+- `dir` *(str)* – Folder with CSVs to be plotted. Example: `'./scatter_area'`.
+- `ylabel` *(str)* – Y-axis label. Default is `"Number of Papers"`.
+- `ignore_current_year` *(int)* – Ignores the most recent N years (often incomplete). Default: `1`.
+- `past_what_years` *(int)* – Restrict to the last N years. Default: `30`.
+- `random_color` *(int)* – Reserved for future use (currently unused).
+- `renderer` *(str)* – How to display the plot (`"notebook"`, `"browser"`, etc.).
+- `template` *(str or None)* – Plotly theme template (e.g., `"plotly_dark"`, `"ggplot2"`).
+
+---
+
+### 🔹 `count_plotter(...)`
+
+**Purpose:**  
+Generates line plots of yearly counts from all CSV files in a given directory.
+
+**Arguments:**
+- `files_directory` *(str)* – Directory containing CSVs. Default: `'./counts'`.
+- `ignore_current_year` *(int)* – Skip the most recent N years.
+- `queryprint` *(int)* – If set to `1`, shows the actual Scopus query on hover. Default: `0`.
+- `ylabel` *(str)* – Y-axis label. Default: `"Counts"`.
+- `template` *(str or None)* – Plotly theme.
+- `renderer` *(str)* – Plot display method.
+
+---
+
+### 🔹 `top_k_what_plotter(file, what='AFFILIATION', k=10, dir='./files', ...)`
+
+**Purpose:**  
+Creates horizontal bar charts for the top-k entries of a specified field (e.g., top affiliations).
+
+**Arguments:**
+- `file` *(str)* – File name of the CSV (e.g. `'ai_global_ar_re.csv'`).
+- `what` *(str)* – Column to plot (e.g., `"AFFILIATION"`, `"AUTHOR"`).
+- `k` *(int)* – Number of top items to display. Default: `10`.
+- `dir` *(str)* – Directory containing the file. Default: `'./files'`.
+- `renderer` *(str)* – Plot display method.
+- `template` *(str or None)* – Plotly theme.
+
+---
+
+### 🔹 `ratio_plotter(files_directory='./ratio', plot_list='ratio_plot_list.csv', template=None)`
+
+**Purpose:**  
+Plots ratios between two sets of yearly counts (numerator / denominator).
+
+**Arguments:**
+- `files_directory` *(str)* – Directory that contains the relevant CSV files and `plot_list` CSV.
+- `plot_list` *(str)* – CSV file with columns: `title`, `soorat` (numerator), and `makhraj` (denominator).
+- `template` *(str or None)* – Plotly theme.
+
+**Example `ratio_plot_list.csv`:**
+
+```csv
+title,soorat,makhraj
+Iran Share in AI,ai_iran_ar_re.csv,ai_global_ar_re.csv
+```
+
+---
+
+### 🔹 `set_plot_theme(theme_name)`
+
+**Purpose:**  
+Set a global Plotly theme for all subsequent plots.
+
+**Arguments:**
+- `theme_name` *(str)* – Valid Plotly theme name (`"ggplot2"`, `"plotly_dark"`, `"seaborn"`, etc.).
+
+---
+
+### 🔹 `get_plot_theme()`
+
+**Purpose:**  
+Returns the currently active global Plotly theme.
+
+**Returns:**
+- *(str)* – Name of the active theme.
