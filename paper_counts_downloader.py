@@ -1,44 +1,34 @@
-# regarding the limitations with playwright, this code is less likely 
-# to run correctly on of google.colab free tier, even if set to headless mode!
-
-
 import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+import pandas as pd
 
-QUERIES = {
-    "immuno": 'TITLE-ABS-KEY (immunotherap*) OR TITLE-ABS-KEY ("immuno engineering") OR TITLE-ABS-KEY ("immunoengineering")',
-    "all_articles   ": 'PUBYEAR > 1',
-    "life_sciences": 'PUBYEAR > 1 AND ( LIMIT-TO ( SUBJAREA , "MEDI" ) OR LIMIT-TO ( SUBJAREA , "BIOC" ) OR LIMIT-TO ( SUBJAREA , "IMMU" ) OR LIMIT-TO ( SUBJAREA , "PHAR" ) OR LIMIT-TO ( SUBJAREA , "AGRI" ) OR LIMIT-TO ( SUBJAREA , "NEUR"))',
-    "cancer_vaccine": 'TITLE-ABS-KEY("Cancer Vaccin*")',
-    "car_t_cell": 'TITLE-ABS-KEY("chimeric antigen receptor")',
-    "til": 'TITLE-ABS-KEY("Tumor-infiltrating lymphocytes") OR TITLE-ABS-KEY("Lymphocytes, Tumor-Infiltrating")',
-    "nk_cell": '(TITLE-ABS-KEY("NK therap*") OR TITLE-ABS-KEY("Natural Killer Cel*") OR TITLE-ABS-KEY("Killer Cells, Natural"))',
-    "macrophage": 'TITLE-ABS-KEY(macrophag*)',
-    "checkpoint_inhibitors": 'TITLE-ABS-KEY("checkpoint inhibit*")',
-    "oncolytic_virus": '(TITLE-ABS-KEY("oncolytic virus*") OR TITLE-ABS-KEY("Oncolytic Virotherap*") OR TITLE-ABS-KEY("Oncolytic Adenovirus*") OR TITLE-ABS-KEY(virotherapy))',
-    "monoclonal_antibodies": '(TITLE-ABS-KEY("Monoclonal Antibod*") OR TITLE-ABS-KEY("Antibodies, Monoclonal"))',
-    "adcs": '(TITLE-ABS-KEY("Antibody-drug conjugat*") OR TITLE-ABS-KEY("Antibody drug conjugat*"))'
-}
+query_list = pd.read_csv("to_download.csv")
+
+QUERIES = dict(zip(query_list['query_name'], query_list['query_string']))
+
+
+
+
 
 VARIATIONS = [
     ("global_ar_re", ""),
     ("iran_ar_re", " AND AFFILCOUNTRY(Iran)"),
-    ("global_ar", " AND DOCTYPE(ar)"),
-    ("global_re", " AND DOCTYPE(re)"),
-    ("iran_ar", " AND AFFILCOUNTRY(Iran) AND DOCTYPE(ar)"),
-    ("iran_re", " AND AFFILCOUNTRY(Iran) AND DOCTYPE(re)"),
+    ("global_ar_0", " AND DOCTYPE(ar)"),
+    ("global_re_0", " AND DOCTYPE(re)"),
+    ("iran_ar_0", " AND AFFILCOUNTRY(Iran) AND DOCTYPE(ar)"),
+    ("iran_re_0", " AND AFFILCOUNTRY(Iran) AND DOCTYPE(re)"),
     
 ]
 
-DOWNLOAD_DIR = "scopus_filter_counts2"
+DOWNLOAD_DIR = "files"
 
 
 def run_scopus_export(query, download_folder, label):
     os.makedirs(download_folder, exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=False)
         context = browser.new_context(accept_downloads=True)
         page = context.new_page()
 
@@ -48,6 +38,11 @@ def run_scopus_export(query, download_folder, label):
         #input("After logging in and seeing the Scopus homepage, press ENTER to continue...")
 
         for var_label, var_suffix in VARIATIONS:
+            save_path = Path(download_folder) / f"{label}_{var_label}.csv"
+            if save_path.exists():
+                print(f"⏩ Skipping already downloaded: {save_path}")
+                continue
+
             search_query = query + var_suffix
             search_url = (
                 "https://www.scopus.com/results/results.uri?src=s&editSaveSearch=&origin=searchbasic&"
