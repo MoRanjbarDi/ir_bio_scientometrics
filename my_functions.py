@@ -179,13 +179,18 @@ def ratio_plotter(files_directory = "./ratio" , plot_list = "ratio_plot_list.csv
         # Compute the ratio
         ratio["Counts Ratio"] = ratio[f"YEAR_COUNTS{soorat_file}"] / ratio[f"YEAR_COUNTS{makhraj_file}"]
 
-        # Add the trace to the figure
+        # Add the trace to the figure 
         fig.add_trace(go.Scatter(
-            x=ratio["YEAR"],
-            y=ratio["Counts Ratio"],
-            mode='lines+markers',
-            name=title  # this sets the legend label
-        ))
+        x=ratio["YEAR"],
+        y=ratio["Counts Ratio"],
+        mode='lines+markers',
+        name=title,
+        line=dict(
+            color=color if pd.notna(color) else None,
+            dash=line_style if pd.notna(line_style) else "solid"
+        )
+    ))
+
 
     # Update the layout of the plot
     fig.update_layout(
