@@ -167,6 +167,9 @@ def ratio_plotter(files_directory = "./ratio" , plot_list = "ratio_plot_list.csv
         title = row["title"]
         soorat_file = row["soorat"]
         makhraj_file = row["makhraj"]
+        color = row.get("color", None)
+        line_style = row.get("line_style", "solid")  # default to solid
+
 
         # Read the numerator and denominator datasets
         soorat, _ = read_data(soorat_file, files_directory)
