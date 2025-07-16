@@ -1,6 +1,6 @@
 title,soorat,makhraj,color,line_style,available_colors (hex also available),available_styles
 نمودار ۱,general_iran-ar_filter_counts.csv,general_iran_filter_counts.csv,Black White Gray Red Green Blue Cyan Magenta Yellow Orange Brown Purple Pink Navy Teal Olive Gold Silver,solid dot dash dashdot longdash longdashdot
-نمودار ۲,general_iran_filter_counts.csv,general_iran-ar_filter_counts.csv
-نمودار ۳,,
-نمودار ۴,,
-نمودار ۵,,
+نمودار ۲,general_iran_filter_counts.csv,general_iran-ar_filter_counts.csv,,
+نمودار ۳,,,,
+نمودار ۴,,,,
+نمودار ۵,,,,
